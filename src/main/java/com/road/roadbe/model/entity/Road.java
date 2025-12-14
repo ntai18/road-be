@@ -6,6 +6,9 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.antlr.v4.runtime.misc.NotNull;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 import java.time.LocalDate;
 import java.util.List;
 
@@ -74,7 +77,8 @@ public class Road {
     private CtptStatusType ctptStatus;
 
     @Column(nullable = false )
-    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.STRING)// này thêm vào để n chuyển enum của mình bth thôi bạn k có gì , nó k map được daud
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     private RoadHandoverStatus roadHandoverStatus;
 
     @Column(name = "note")

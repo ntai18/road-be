@@ -1,11 +1,8 @@
 package com.road.roadbe.repository;
-
-import com.road.roadbe.model.dto.response.RoadResponse;
 import com.road.roadbe.model.entity.Road;
 import com.road.roadbe.type.CtptStatusType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
@@ -17,15 +14,14 @@ import java.util.Optional;
 public interface RoadRepository extends JpaRepository<Road, Long> {
     List<Road> findAllBy();
     Optional<Road> findById(Long id);
-
-    @Query("""
+    @Query( """
             SELECT r FROM Road r
-            WHERE (:address IS NULL OR r.address LIKE %:address%)
-            AND (:parentRoad IS NULL OR r.parentRoad LIKE %:parentRoad%)
-            AND (:name IS NULL OR r.name LIKE %:name%)
-            AND (:territory IS NULL OR r.territory LIKE %:territory%)
-            AND (:handoverDate IS NULL OR r.handoverDate = :handoverDate)
-            AND (:investor IS NULL OR r.investor LIKE %:investor%)
+            WHERE (:address IS NULL OR LOWER(r.address) LIKE LOWER(CONCAT('%', :address, '%')))
+            AND (:parentRoad IS NULL OR LOWER(r.parentRoad) LIKE LOWER(CONCAT('%', :parentRoad, '%')))
+            AND (:name IS NULL OR LOWER(r.name) LIKE LOWER(CONCAT('%', :name, '%')))
+            AND (:territory IS NULL OR LOWER(r.territory) LIKE LOWER(CONCAT('%', :territory, '%')))
+            AND (r.handoverDate > :handoverDate)
+            AND (:investor IS NULL OR LOWER(r.investor) LIKE LOWER(CONCAT('%', :investor, '%')))
             AND (:ctptStatus IS NULL OR r.ctptStatus = :ctptStatus)
             """)
         List<Road> search(

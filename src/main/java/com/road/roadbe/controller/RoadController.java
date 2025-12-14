@@ -33,6 +33,6 @@ public class RoadController {
     }
     @GetMapping("/search")
     public List<RoadDisplayResponse> searchRoads(@RequestBody RoadSearchRequest roadSearchRequest) {
-        return roadService.getAllRoads();
+        return roadService.search(roadSearchRequest); // dcm b ảo à, b ghet all nó trả về all đúng r ??? , tutu để tôi thử lại xem như nào
     }
 }

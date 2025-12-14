@@ -8,13 +8,16 @@ import com.road.roadbe.model.entity.Road;
 import com.road.roadbe.repository.RoadRepository;
 import com.road.roadbe.service.RoadService;
 import com.road.roadbe.type.CtptStatusType;
+import com.road.roadbe.type.RoadHandoverStatus;
 import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RoadServiceImpl implements RoadService {
@@ -40,8 +43,8 @@ public class RoadServiceImpl implements RoadService {
         road.setHandoverMinutesNumber(roadRequest.getHandoverMinutesNumber());
         road.setHandoverDate(roadRequest.getHandoverDate());
         road.setProgress(roadRequest.getProgress());
-        road.setCtptStatus(roadRequest.getCtptStatus());
-        road.setRoadHandoverStatus(roadRequest.getRoadHandoverStatus());
+        road.setCtptStatus(CtptStatusType.fromCtpt(String.valueOf(roadRequest.getCtptStatus())));
+        road.setRoadHandoverStatus(RoadHandoverStatus.fromRoadHandoverStatus(String.valueOf(roadRequest.getRoadHandoverStatus())));
         road.setNote(roadRequest.getNote());
         roadRepository.save(road);
         return RoadResponse.builder()
@@ -91,12 +94,6 @@ public class RoadServiceImpl implements RoadService {
 
     @Override
     public RoadResponse updateRoad(Long id, RoadRequest roadRequest) {
-        // vãi lồn bạn, tôi chịu bạn đấy . sao bạn đoạn này xử lí như này là tư duy quá mức của tôi r
-        // tasch ra, nó có 1 cái gọi là StringUtils
-        // sưa tì sưa rnhw thế
-        // nó cũng dài mà bạn , khác gì kia đâu =)))
-        // thằng StringUtil nó hỗ trợ, với lại k ai nhét 1 đống vào 1 method như thế
-        // ok bạn có gì tôi sửa , giờ bạn cứ push lên git đi tí tôi merge lại mấy cái đó
         Road road = roadRepository.findById(id).orElseThrow(()-> new RuntimeException("road not found"));
         applyUpdate(roadRequest, road);
         return RoadResponse.builder()
@@ -123,25 +120,62 @@ public class RoadServiceImpl implements RoadService {
     }
 
     private void applyUpdate(RoadRequest roadRequest, Road road) {
-        if (StringUtils.isBlank(roadRequest.getName())) road.setName(roadRequest.getName());
-        if (roadRequest.getParentRoad() != null) road.setParentRoad(roadRequest.getParentRoad());
-        if (roadRequest.getTerritory() != null) road.setTerritory(roadRequest.getTerritory());
-        if (roadRequest.getManagement() != null) road.setManagement(roadRequest.getManagement());
-        if (roadRequest.getStartPoint() != null) road.setStartPoint(roadRequest.getStartPoint());
-        if (roadRequest.getEndPoint() != null) road.setEndPoint(roadRequest.getEndPoint());
-        if (roadRequest.getDistanceFromKm0() != null) road.setDistanceFromKm0(roadRequest.getDistanceFromKm0());
-        if (roadRequest.getAddress() != null) road.setAddress(roadRequest.getAddress());
-        if (roadRequest.getRoadEdgeDistance() != null) road.setRoadEdgeDistance(roadRequest.getRoadEdgeDistance());
-        if (roadRequest.getLength() != null) road.setLength(roadRequest.getLength());
-        if (roadRequest.getWidth() != null) road.setWidth(roadRequest.getWidth());
-        if (roadRequest.getInvestor() != null) road.setInvestor(roadRequest.getInvestor());
-        if (roadRequest.getHandoverMinutes() != null) road.setHandoverMinutes(roadRequest.getHandoverMinutes());
-        if (roadRequest.getHandoverMinutesNumber() != null) road.setHandoverMinutesNumber(roadRequest.getHandoverMinutesNumber());
-        if (roadRequest.getHandoverDate() != null) road.setHandoverDate(roadRequest.getHandoverDate());
-        if (roadRequest.getProgress() != null) road.setProgress(roadRequest.getProgress());
-        if (roadRequest.getCtptStatus() != null) road.setCtptStatus(roadRequest.getCtptStatus());
-        if (roadRequest.getRoadHandoverStatus() != null) road.setRoadHandoverStatus(roadRequest.getRoadHandoverStatus());
-        if (roadRequest.getNote() != null) road.setNote(roadRequest.getNote());
+        if (StringUtils.isNotBlank(roadRequest.getName()))
+            road.setName(roadRequest.getName());
+
+        if (StringUtils.isNotBlank(roadRequest.getParentRoad()))
+            road.setParentRoad(roadRequest.getParentRoad());
+
+        if (StringUtils.isNotBlank(roadRequest.getTerritory()))
+            road.setTerritory(roadRequest.getTerritory());
+
+        if (StringUtils.isNotBlank(roadRequest.getManagement()))
+            road.setManagement(roadRequest.getManagement());
+
+        if (StringUtils.isNotBlank(roadRequest.getStartPoint()))
+            road.setStartPoint(roadRequest.getStartPoint());
+
+        if (StringUtils.isNotBlank(roadRequest.getEndPoint()))
+            road.setEndPoint(roadRequest.getEndPoint());
+
+        if (StringUtils.isNotBlank(roadRequest.getDistanceFromKm0()))
+            road.setDistanceFromKm0(roadRequest.getDistanceFromKm0());
+
+        if (StringUtils.isNotBlank(roadRequest.getAddress()))
+            road.setAddress(roadRequest.getAddress());
+
+        if (roadRequest.getRoadEdgeDistance() != null)
+            road.setRoadEdgeDistance(roadRequest.getRoadEdgeDistance());
+
+        if (roadRequest.getLength() != null)
+            road.setLength(roadRequest.getLength());
+
+        if (roadRequest.getWidth() != null)
+            road.setWidth(roadRequest.getWidth());
+
+        if (StringUtils.isNotBlank(roadRequest.getInvestor()))
+            road.setInvestor(roadRequest.getInvestor());
+
+        if (StringUtils.isNotBlank(roadRequest.getHandoverMinutes()))
+            road.setHandoverMinutes(roadRequest.getHandoverMinutes());
+
+        if (StringUtils.isNotBlank(roadRequest.getHandoverMinutesNumber()))
+            road.setHandoverMinutesNumber(roadRequest.getHandoverMinutesNumber());
+
+        if (roadRequest.getHandoverDate() != null)
+            road.setHandoverDate(roadRequest.getHandoverDate());
+
+        if (roadRequest.getProgress() != null)
+            road.setProgress(roadRequest.getProgress());
+
+        if (roadRequest.getCtptStatus() != null)
+            road.setCtptStatus(roadRequest.getCtptStatus());
+
+        if (roadRequest.getRoadHandoverStatus() != null)
+            road.setRoadHandoverStatus(roadRequest.getRoadHandoverStatus());
+
+        if (StringUtils.isNotBlank(roadRequest.getNote()))
+            road.setNote(roadRequest.getNote());
     }
 
     @Override
@@ -156,9 +190,9 @@ public class RoadServiceImpl implements RoadService {
                                                 emptyToNull(roadSearchRequest.getParentRoad()),
                                                 emptyToNull(roadSearchRequest.getName()),
                                                 emptyToNull(roadSearchRequest.getTerritory()),
-                                                emptyToNull(roadSearchRequest.getHandoverDate()),
+                                                (roadSearchRequest.getHandoverDate() == null ? LocalDate.EPOCH : roadSearchRequest.getHandoverDate()),
                                                 emptyToNull(roadSearchRequest.getInvestor()),
-                                                emptyToNull(roadSearchRequest.getCtptStatus()));
+                                                (roadSearchRequest.getCtptStatus() == null ? CtptStatusType.ACTIVE: roadSearchRequest.getCtptStatus()));
         return road.stream()
                     .map(roads -> RoadDisplayResponse.builder()
                                                           .name(roads.getName())
@@ -174,10 +208,10 @@ public class RoadServiceImpl implements RoadService {
                     )
                     .toList();
     }
-    private <T> T emptyToNull(T val) {
-        if (val == null) return null;
-        if (val instanceof String str && str.isBlank()) return null;
-        return val;
+    private <T> String emptyToNull(T val) {
+        if (val == null) return "";
+        if (val.toString().isEmpty()) return "";
+        return val.toString();
     }
 
 }
