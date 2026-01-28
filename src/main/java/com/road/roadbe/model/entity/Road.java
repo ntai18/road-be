@@ -77,7 +77,7 @@ public class Road {
     private CtptStatusType ctptStatus;
 
     @Column(nullable = false )
-    @Enumerated(EnumType.STRING)// này thêm vào để n chuyển enum của mình bth thôi bạn k có gì , nó k map được daud
+    @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     private RoadHandoverStatus roadHandoverStatus;
 
